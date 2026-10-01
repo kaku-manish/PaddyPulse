@@ -39,8 +39,7 @@
 23. [Future Enhancements](#-future-enhancements)
 24. [Real-World Use Case](#-real-world-use-case)
 25. [Project Highlights](#-project-highlights)
-26. [Resume-Friendly Technical Summary](#-resume-friendly-technical-summary)
-27. [Author & Contact](#-author--contact)
+26. [Author & Contact](#-author--contact)
 
 ---
 
@@ -895,16 +894,6 @@ The repository contains automated test scripts located in `backend/` to validate
 - **Micro-Budgeting & Economic Guidance:** Translates complex diagnoses into realistic chemical dosages and financial estimates per acre.
 - **Inclusive Multilingual Engineering:** Native support for English and Telugu, complete with automated A4 PDF and WhatsApp infographic card generation.
 - **Enterprise-Ready Full-Stack Architecture:** Asynchronous FastAPI backend, dual PostgreSQL/SQLite database support, and modern React 19 frontend.
-
----
-
-## 📄 Resume-Friendly Technical Summary
-
-- **PaddyPulse – AI Smart Agriculture Platform (React, FastAPI, YOLOv8, PostgreSQL):**
-  - Engineered an end-to-end precision agriculture platform integrating a fine-tuned **YOLOv8** computer vision model achieving **94.68% Top-1 accuracy** across 10 paddy disease categories.
-  - Implemented an **OpenCV HSV heuristic filter** reducing false-positive non-plant uploads by verifying green vegetation thresholds prior to model inference.
-  - Architected an asynchronous **FastAPI** backend supporting **dual-database persistence (Supabase PostgreSQL / local SQLite)** with 29 relational tables and sub-250ms in-process inference.
-  - Developed an automated reporting engine leveraging **ReportLab** and **Pillow** to compile localized A4 diagnostic PDFs and WhatsApp infographic cards in **English and Telugu**.
 
 ---
 
