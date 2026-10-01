@@ -23,23 +23,24 @@
 7. [How PaddyPulse Works (Step-by-Step Workflow)](#-how-paddypulse-works)
 8. [Machine Learning Pipeline](#-machine-learning-pipeline)
 9. [IoT & Environmental Telemetry Integration](#-iot--environmental-telemetry-integration)
-10. [Backend Architecture](#-backend-architecture)
-11. [API Endpoints Reference](#-api-endpoints-reference)
-12. [Frontend Architecture](#-frontend-architecture)
-13. [Database Design & Schema](#-database-design--schema)
-14. [Project Structure](#-project-structure)
-15. [Installation & Setup](#-installation--setup)
-16. [Environment Configuration](#-environment-configuration)
-17. [Running the Application](#-running-the-application)
-18. [Example Prediction Lifecycle](#-example-prediction-lifecycle)
-19. [Application Screenshots](#-application-screenshots)
-20. [Testing Suite](#-testing-suite)
-21. [Engineering Decisions & Technical Challenges](#-engineering-decisions--technical-challenges)
-22. [Future Enhancements](#-future-enhancements)
-23. [Real-World Use Case](#-real-world-use-case)
-24. [Project Highlights](#-project-highlights)
-25. [Resume-Friendly Technical Summary](#-resume-friendly-technical-summary)
-26. [Author & Contact](#-author--contact)
+10. [Drone Technology & Aerial Survey Integration](#-drone-technology--aerial-survey-integration)
+11. [Backend Architecture](#-backend-architecture)
+12. [API Endpoints Reference](#-api-endpoints-reference)
+13. [Frontend Architecture](#-frontend-architecture)
+14. [Database Design & Schema](#-database-design--schema)
+15. [Project Structure](#-project-structure)
+16. [Installation & Setup](#-installation--setup)
+17. [Environment Configuration](#-environment-configuration)
+18. [Running the Application](#-running-the-application)
+19. [Example Prediction Lifecycle](#-example-prediction-lifecycle)
+20. [Application Screenshots](#-application-screenshots)
+21. [Testing Suite](#-testing-suite)
+22. [Engineering Decisions & Technical Challenges](#-engineering-decisions--technical-challenges)
+23. [Future Enhancements](#-future-enhancements)
+24. [Real-World Use Case](#-real-world-use-case)
+25. [Project Highlights](#-project-highlights)
+26. [Resume-Friendly Technical Summary](#-resume-friendly-technical-summary)
+27. [Author & Contact](#-author--contact)
 
 ---
 
@@ -321,6 +322,48 @@ Recommendations enforce specific weather windows (`backend/config/disease_rules.
 - Rain-Free Forecast: $\ge 6 \text{ hours}$
 - Temperature Range: $10^\circ\text{C} \le T \le 32^\circ\text{C}$
 - Minimum Relative Humidity: $\ge 40\%$
+
+---
+
+## 🚁 Drone Technology & Aerial Survey Integration
+
+PaddyPulse incorporates a dedicated aerial survey and drone fleet infrastructure designed for field-scale crop scouting, automated aerial disease screening, and commercial drone operator dispatch.
+
+```mermaid
+flowchart LR
+    A[Drone Survey Flight] -->|Overhead Canopy Capture| B(High-Res Aerial Orthophoto)
+    B -->|POST /drone/analysis| C{OpenCV Green Mask}
+    C -- Failed (<10% Green) --> D[Reject: Camera Angle Off-Target]
+    C -- Passed (>=10% Green) --> E[In-Process YOLOv8 Inference]
+    E --> F[Generate Annotated Visual Map]
+    E --> G[(Save DB: source='drone')]
+    G --> H[Admin Drone Control Center]
+    G --> I[Branded Drone PDF Report: 'Analyzed Drone View']
+```
+
+### 1. Aerial Survey & Ingestion Pipeline
+While single-leaf smartphone uploads assist localized spot-checks, managing large-scale rice paddies requires aerial monitoring:
+- **Overhead Aerial Ingestion (`POST /drone/analysis`):** Ingests aerial flight imagery along with farm identification (`farm_id`), predicted disease classes, and field severity indicators.
+- **Canopy Verification Pre-Filter:** Utilizes OpenCV HSV color masking to verify that aerial camera angles capture viable crop canopy rather than irrigation canals, field bunds, or bare soil.
+- **Sub-Second Aerial Classification:** Evaluates images using the in-process YOLOv8 model, generating an annotated orthophoto crop (`_analyzed.jpg`) and logging the entry to the `disease_analyses` table with `source='drone'`.
+- **Historical Survey Auditing (`GET /drone/history/{farmId}`):** Maintains an immutable audit trail of past aerial surveys, enabling longitudinal comparison of disease progression across flight dates.
+
+### 2. Commercial Drone Operator Marketplace (`/ops`)
+PaddyPulse features a dedicated module connecting farmers with certified commercial drone pilots:
+- **Pilot KYC & Verification:** Validates pilot licensing, experience flight counts, and verification status (`kyc_status: 'verified' | 'pending'`).
+- **Dynamic Per-Acre Pricing:** Calculates automated survey quotations based on farm acreage and operator base rates (`base_rate_per_acre`, default ₹150/acre).
+- **Booking & Flight Dispatch (`POST /ops/book`):** Enables farmers to schedule aerial surveys with exact GPS field coordinates (`lat`, `lng`) and desired survey dates.
+- **Automated Payout Engine (`operator_payouts`):** Computes operator compensation upon completed scan delivery, including performance bonuses and delay penalties.
+
+### 3. Drone-Specific Branded Health Reports
+Reports generated from aerial survey data automatically receive custom drone branding via `backend/routes/reports.py` and `report_engine.py`:
+- **Visual Badge:** Generates the `"AI Vision: Analyzed Drone View"` (or `"AI దృష్టి: Drone View"` in Telugu) banner directly on generated A4 PDF reports.
+- **Spatial Alignment:** Embeds annotated aerial defect maps into the medical-style bulletin alongside chemical prescriptions, dosage requirements, and weather-safe flight/spray windows.
+
+### 4. Administrative Drone Control Center
+The platform provides administrative oversight via `AdminDroneAnalysis.jsx` and `AdminDroneReportControl.jsx`:
+- **Flight & Batch Telemetry:** Real-time visibility into survey upload streams, multi-class confidence ratings, and operator schedules.
+- **Simulated Survey Controls:** Allows administrators and researchers to initiate automated survey workflows and batch-process multi-zone field scans.
 
 ---
 
